@@ -1,0 +1,13 @@
+SET(SOURCES screens/ui_MenuScreen.c
+    ui.c
+    components/ui_comp_hook.c
+    ui_helpers.c
+    images/ui_img_images_menu_icon_xiaozhi_ai_png.c
+    images/ui_img_images_menu_icon_weather_clock_png.c
+    images/ui_img_images_menu_icon_music_png.c
+    images/ui_img_images_menu_icon_muyu_png.c
+    images/ui_img_images_menu_icon_fm_png.c
+    images/ui_img_images_menu_icon_pc_monitor_png.c
+    fonts/ui_font_simhei16.c)
+
+add_library(ui ${SOURCES})

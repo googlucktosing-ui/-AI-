@@ -36,6 +36,7 @@ set(SOURCES "audio/audio_codec.cc"
             "settings.cc"
             "device_state_machine.cc"
             "assets.cc"
+            "music_player.cc"
             "main.cc"
             )
 
@@ -997,6 +998,8 @@ idf_component_register(SRCS ${SOURCES}
                         efuse
                         bt
                         fatfs
+                        sdmmc
+                        esp_audio_codec
                         ${MAIN_PRIV_REQUIRES_EXTRA}
                     )
 

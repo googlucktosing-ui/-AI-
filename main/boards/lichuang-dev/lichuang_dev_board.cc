@@ -8,6 +8,7 @@
 #include "i2c_device.h"
 #include "esp32_camera.h"
 #include "mcp_server.h"
+#include "music_player.h"
 #include "ui/menu_screen/ui.h"
 
 #include <esp_log.h>
@@ -76,6 +77,7 @@ private:
     Display* display_;
     Pca9557* pca9557_;
     Esp32Camera* camera_;
+    MusicPlayer* music_player_ = nullptr;
     lv_obj_t* menu_previous_screen_ = nullptr;
     bool menu_visible_ = false;
 
@@ -92,7 +94,17 @@ private:
         lv_obj_t* target = lv_event_get_target_obj(e);
         if (target == ui_tile_xiaozhi_ai) {
             board->HideMainMenuFromLvgl();
+        } else if (target == ui_tile_music) {
+            board->ShowMusicPlayerFromLvgl();
         }
+    }
+
+    void ShowMusicPlayerFromLvgl() {
+        if (music_player_ == nullptr) {
+            music_player_ = new MusicPlayer(GetAudioCodec(), display_);
+        }
+        menu_visible_ = false;
+        music_player_->Load(ui_MenuScreen);
     }
 
     void HideMainMenuFromLvgl() {
@@ -114,7 +126,9 @@ private:
 
         ui_MenuScreen_screen_init();
         lv_obj_add_flag(ui_tile_xiaozhi_ai, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_flag(ui_tile_music, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_event_cb(ui_tile_xiaozhi_ai, MenuTileEventCallback, LV_EVENT_CLICKED, this);
+        lv_obj_add_event_cb(ui_tile_music, MenuTileEventCallback, LV_EVENT_CLICKED, this);
     }
 
     void ShowMainMenu() {

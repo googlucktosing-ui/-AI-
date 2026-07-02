@@ -57,6 +57,19 @@ list(APPEND SOURCES
 )
 list(APPEND INCLUDE_DIRS "ui/menu_screen")
 
+# SquareLine music player UI
+list(APPEND SOURCES
+    "ui/musicplay/screens/ui_MusicPlayScreen.c"
+    "ui/musicplay/images/ui_img_images_musicplay_icon_album_music_png.c"
+    "ui/musicplay/images/ui_img_images_musicplay_icon_volume_png.c"
+    "ui/musicplay/images/ui_img_images_musicplay_icon_prev_png.c"
+    "ui/musicplay/images/ui_img_images_musicplay_icon_play_png.c"
+    "ui/musicplay/images/ui_img_images_musicplay_icon_pause_png.c"
+    "ui/musicplay/images/ui_img_images_musicplay_icon_next_png.c"
+    "ui/musicplay/fonts/musicplay_font_simhei16.c"
+)
+list(APPEND INCLUDE_DIRS "ui/musicplay")
+
 # Add board common files
 list(APPEND SOURCES
     "boards/common/board.cc"

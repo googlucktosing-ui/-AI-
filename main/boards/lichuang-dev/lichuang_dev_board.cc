@@ -79,6 +79,7 @@ private:
     Esp32Camera* camera_;
     MusicPlayer* music_player_ = nullptr;
     lv_obj_t* menu_previous_screen_ = nullptr;
+    lv_obj_t* xiaozhi_screen_ = nullptr;
     bool menu_visible_ = false;
 
     static void MenuTileEventCallback(lv_event_t* e) {
@@ -93,18 +94,30 @@ private:
 
         lv_obj_t* target = lv_event_get_target_obj(e);
         if (target == ui_tile_xiaozhi_ai) {
-            board->HideMainMenuFromLvgl();
+            board->ShowXiaozhiFromLvgl();
         } else if (target == ui_tile_music) {
             board->ShowMusicPlayerFromLvgl();
         }
     }
 
     void ShowMusicPlayerFromLvgl() {
+        ESP_LOGI(TAG, "Menu music tile clicked");
         if (music_player_ == nullptr) {
             music_player_ = new MusicPlayer(GetAudioCodec(), display_);
         }
         menu_visible_ = false;
         music_player_->Load(ui_MenuScreen);
+    }
+
+    void ShowXiaozhiFromLvgl() {
+        if (music_player_ != nullptr && music_player_->IsVisible()) {
+            music_player_->BackToMenu();
+        }
+        lv_obj_t* target_screen = xiaozhi_screen_ != nullptr ? xiaozhi_screen_ : menu_previous_screen_;
+        if (target_screen != nullptr && target_screen != ui_MenuScreen) {
+            lv_screen_load(target_screen);
+        }
+        menu_visible_ = false;
     }
 
     void HideMainMenuFromLvgl() {
@@ -137,6 +150,9 @@ private:
         lv_obj_t* active_screen = lv_screen_active();
         if (active_screen != ui_MenuScreen) {
             menu_previous_screen_ = active_screen;
+            if (music_player_ == nullptr || !music_player_->IsVisible()) {
+                xiaozhi_screen_ = active_screen;
+            }
         }
         lv_screen_load(ui_MenuScreen);
         menu_visible_ = true;
@@ -189,22 +205,31 @@ private:
     void InitializeButtons() {
         boot_button_.OnClick([this]() {
             auto& app = Application::GetInstance();
+            ESP_LOGI(TAG, "IO0 single click, state=%d menu_visible=%d music_visible=%d", app.GetDeviceState(),
+                     menu_visible_, music_player_ != nullptr && music_player_->IsVisible());
             // During startup (before connected), pressing BOOT button enters Wi-Fi config mode without reboot
             if (app.GetDeviceState() == kDeviceStateStarting) {
                 EnterWifiConfigMode();
                 return;
             }
-            ToggleMainMenu();
+            if (menu_visible_) {
+                return;
+            }
+            if (music_player_ != nullptr && music_player_->IsVisible()) {
+                music_player_->TogglePlayPause();
+                return;
+            }
+            app.ToggleChatState();
         });
 
-#if CONFIG_USE_DEVICE_AEC
         boot_button_.OnDoubleClick([this]() {
             auto& app = Application::GetInstance();
-            if (app.GetDeviceState() == kDeviceStateIdle) {
-                app.SetAecMode(app.GetAecMode() == kAecOff ? kAecOnDeviceSide : kAecOff);
+            ESP_LOGI(TAG, "IO0 double click, state=%d menu_visible=%d", app.GetDeviceState(), menu_visible_);
+            if (app.GetDeviceState() == kDeviceStateStarting) {
+                return;
             }
+            ToggleMainMenu();
         });
-#endif
     }
 
     void InitializeSt7789Display() {

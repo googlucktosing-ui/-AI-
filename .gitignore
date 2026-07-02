@@ -13,6 +13,7 @@ dependencies.lock
 releases/
 main/assets/lang_config.h
 main/mmap_generate_emoji.h
+main/ui/backup/
 .DS_Store
 .cache
 *.pyc
